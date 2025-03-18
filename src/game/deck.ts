@@ -16,30 +16,31 @@ export interface Card {
   color?: Color
 }
 
-export const generateDeck = (): Card[] => {
+export const generateDeck = (amount: number): Card[] => {
   const deck: Card[] = []
-
-  COLORS.forEach(color => {
-    
-    deck.push({ key: `${color}${0}`, type: 'number', value: 0, color })
-    for (let i = 1; i <= 9; i++){
-      deck.push({ key: `${color}${i}1`, type: 'number', value: i, color })
-      deck.push({ key: `${color}${i}2`, type: 'number', value: i, color })
-    }
-
-    SPECIAL_CARDS.forEach(specialCard => {
-      deck.push({ key: `${color}${specialCard}1`, type: 'special', value: specialCard, color })
-      deck.push({ key: `${color}${specialCard}2`, type: 'special', value: specialCard, color })
+  
+  for (let d = 1; d <= amount; d++){
+    COLORS.forEach(color => {
+      deck.push({ key: `${color}-${0}-${d}`, type: 'number', value: 0, color })
+      for (let i = 1; i <= 9; i++){
+        deck.push({ key: `${color}-${i}-1-${d}`, type: 'number', value: i, color })
+        deck.push({ key: `${color}-${i}-2-${d}`, type: 'number', value: i, color })
+      }
+  
+      SPECIAL_CARDS.forEach(specialCard => {
+        deck.push({ key: `${color}-${specialCard}-1-${d}`, type: 'special', value: specialCard, color })
+        deck.push({ key: `${color}-${specialCard}-2-${d}`, type: 'special', value: specialCard, color })
+      })
+  
     })
-
-  })
-
-   WILD_CARDS.forEach(wildCard => {
-     deck.push({ key: `wild${wildCard}1`, type: 'wild', value: wildCard })
-     deck.push({ key: `wild${wildCard}2`, type: 'wild', value: wildCard })
-     deck.push({ key: `wild${wildCard}3`, type: 'wild', value: wildCard })
-     deck.push({ key: `wild${wildCard}4`, type: 'wild', value: wildCard })
-   })
+  
+     WILD_CARDS.forEach(wildCard => {
+       deck.push({ key: `wild-${wildCard}-1-${d}`, type: 'wild', value: wildCard })
+       deck.push({ key: `wild-${wildCard}-2-${d}`, type: 'wild', value: wildCard })
+       deck.push({ key: `wild-${wildCard}-3-${d}`, type: 'wild', value: wildCard })
+       deck.push({ key: `wild-${wildCard}-4-${d}`, type: 'wild', value: wildCard })
+     })
+  }
 
   return shuffle(deck)
 }

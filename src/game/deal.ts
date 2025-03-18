@@ -3,6 +3,7 @@ import type { Card } from './deck'
 export function dealCards(deck: Card[], numPlayers: number, cardsPerPlayer: number) {
   const hands: Card[][] = Array.from({ length: numPlayers }, () => [])
   const remainingDeck = [...deck]
+  const discardPile: Card[] = []
 
   for (let i = 0; i < cardsPerPlayer; i++) {
     for (const hand of hands) {
@@ -12,6 +13,13 @@ export function dealCards(deck: Card[], numPlayers: number, cardsPerPlayer: numb
     }
   }
 
-  const activeCard: Card = remainingDeck.shift()!
-  return { hands, remainingDeck, activeCard }
+  
+  let activeCard: Card = remainingDeck.shift()!
+  discardPile.push(activeCard)
+  while (!activeCard.color) {
+    activeCard = remainingDeck.shift()!
+    discardPile.push(activeCard)
+  }
+
+  return { hands, remainingDeck, activeCard, discardPile }
 }
