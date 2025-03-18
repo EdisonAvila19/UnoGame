@@ -10,7 +10,7 @@ import { shuffle } from './game/shuffle'
 
 //TODO Cambia color con +4
 //TODO Cambiar de color con 🌈
-//TODO Logica de 🚫
+
 //TODO Regla del 0
 //TODO Regla del 7
 
@@ -58,19 +58,23 @@ export default function App() {
     console.log('endTurn', playerIndex, direction, 'isBlocked', isBlocked);
     console.log(turn);
     
+    let nextPlayer
+
     if (direction === 'Clockwise') {
-      if ( playerIndex === NumberOfPlayers - 1 ) {
-        setTurn(0)
-      } else {
-        setTurn(playerIndex + 1)
-      }
+      nextPlayer = ( playerIndex + 1 ) % NumberOfPlayers
     } else {
-      if ( playerIndex === 0 ) {
-        setTurn(NumberOfPlayers - 1)
+      nextPlayer = ( playerIndex - 1 + NumberOfPlayers ) % NumberOfPlayers
+    }
+
+    if (isBlocked) {
+      if (direction === 'Clockwise') {
+        nextPlayer = ( nextPlayer + 1 ) % NumberOfPlayers
       } else {
-        setTurn(playerIndex - 1)
+        nextPlayer = ( nextPlayer - 1 + NumberOfPlayers ) % NumberOfPlayers
       }
     }
+
+    setTurn(nextPlayer)
   }
 
   const drawCard = (playerIndex: number, amount:number = 1) => {
@@ -161,7 +165,13 @@ export default function App() {
     }
 
     setBoard({ ...board, hands: newHands, discardPile, activeCard, activeColor })
-    endTurn(playerIndex, newGameDirection)
+
+    // If the active card is 🚫, skip the next player
+    if (activeCard.value === SPECIAL_CARDS[0]){
+      endTurn(playerIndex, newGameDirection, true)
+    } else {
+      endTurn(playerIndex, newGameDirection)
+    }
   }
 
   return (
