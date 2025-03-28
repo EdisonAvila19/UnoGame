@@ -15,7 +15,8 @@ export function Card({ card, playerIndex, discardCard }: Readonly<CardProps>) {
     <button
       onClick={() => discardCard?.(card, playerIndex ?? 0)}
       data-key={card.key}
-      style={{ background: color, width: '50px', height: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: fontColor, borderRadius: '10px', border: '1px solid black' }}>
+      className='cardComponent'
+      style={{ background: color, color: fontColor }}>
       {value}
     </button>
   )

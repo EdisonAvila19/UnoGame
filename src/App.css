@@ -1,0 +1,98 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.modal {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-background {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0.5;
+}
+
+.modal-content {
+  background: white;
+  opacity: 1;
+  width: 300px;
+  height: auto;
+  padding: 30px;
+  border-radius: 10px;
+  z-index: 1000;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.modal-content div {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  grid-template-columns: 45% 45%;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+}
+
+.modal-content button {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.modal-content button:hover {
+  opacity: 0.8;
+}
+
+.cardComponent {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  border: 1px solid black;
+  box-sizing: border-box;
+}
+
+.stealthCardBtn {
+  padding: 10px 25px;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.hands {
+  display: flex; 
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hand {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  /* border: 1px solid black; */
+}
