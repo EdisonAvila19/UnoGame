@@ -48,10 +48,13 @@ io.on('connection', (socket) => {
     gameState = { ...data }
 
     let gameStart = false
-    if (gameState.players.length > 1)
+    let getRandomTurn = 0
+    if (gameState.players.length > 1) {
       gameStart = true
+      getRandomTurn = Math.floor(Math.random() * gameState.players.length)
+    }
 
-    io.emit('gameState', {...gameState, gameStart})
+    io.emit('gameState', {...gameState, turn: getRandomTurn, gameStart})
   })
 
   socket.on('endTurn', (data) => {
@@ -64,8 +67,20 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    gameState.players = gameState.players.filter((player) => player.id !== socket.id)
+    gameState = {
+      hands: [],
+      remainingDeck: [],
+      discardPile: [],
+      activeCard: null,
+      activeColor: undefined,
+      turn: 0,
+      penalty: 0,
+      gameDirection: 'Clockwise',
+      players: [],
+    }
+    // gameState.players = gameState.players.filter((player) => player.id !== socket.id)
     io.emit('updatePlayers', gameState.players)
+    io.emit('gameState', { ...gameState })
     console.log(`Jugador desconectado: ${socket.id}`);
   })
 })
