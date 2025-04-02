@@ -2,6 +2,7 @@ import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 // import cors from 'cors'
+import 'dotenv/config'
 
 const app = express()
 const server = createServer(app)
@@ -69,4 +70,4 @@ io.on('connection', (socket) => {
   })
 })
 
-server.listen(3001, () => console.log('Servidor corriendo en el puerto 3001'))
+server.listen(process.env.SERVER_PORT, () => console.log(`Servidor corriendo en el puerto ${process.env.SERVER_PORT}`))
