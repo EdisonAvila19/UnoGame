@@ -29,7 +29,7 @@ export default function App() {
 
   const [board, setBoard] = useState({} as Board | undefined)
 
-  const playerNameRef = useRef<{ id: string; name: string; turn: number }>({
+  const playerRef = useRef<{ id: string; name: string; turn: number }>({
     id: '',
     name: '',
     turn: 0
@@ -42,17 +42,16 @@ export default function App() {
   useGameSocket({ setBoard, setTurn, setPenalty, setGameDirection, setPlayers, updatePlayer, setGameStart })
   
   useEffect(()=> {
-    console.log(board)
+    console.log(`board: \n ${board}`)
     if (!board) return
 
-    console.log('hands: ')
-    console.log(board.hands);
+    console.log(`hands: \n ${board.hands}`)
   }, [board])
   
   // Started Game
   const joinGame = () => {
-    if (playerNameRef) {
-      socket.emit('joinGame', playerNameRef.current.name)
+    if (playerRef) {
+      socket.emit('joinGame', playerRef.current.name)
     }
   }
 
@@ -126,7 +125,7 @@ export default function App() {
 
     // Si otro jugador intenta jugar fuera de su turno
     if (playerTurn !== turn) {
-      if (!isValidCard) {
+      if (!isValidCard) { // @fail - Esta permitiendo robar turno si la carta es del mismo color
         const newBoard = drawCard(playerId, 2)
         socket.emit('drawCard', newBoard)
         return
@@ -233,11 +232,11 @@ export default function App() {
   }
 
   const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    playerNameRef.current.name = e.target.value
+    playerRef.current.name = e.target.value
   }
 
   function updatePlayer (player: Player) {
-    playerNameRef.current = {...playerNameRef.current, ...player }
+    playerRef.current = {...playerRef.current, ...player }
   }
 
   return (
@@ -245,10 +244,10 @@ export default function App() {
 
       <h2>Juego de Uno</h2>
       {
-        (playerNameRef && !gameStart) &&
+        (playerRef && !gameStart) &&
         (
           <>
-            <input type="text" defaultValue={playerNameRef.current.name} onChange={handleChangeName} />
+            <input type="text" defaultValue={playerRef.current.name} onChange={handleChangeName} />
             <button onClick={joinGame}>Unirse al juego</button>
             {
               players.length > 1 && <button onClick={startGame}>Comenzar el juego</button>
@@ -270,9 +269,6 @@ export default function App() {
                 })
               }
             </div> */}
-        
-            <h3>Turn: {turn}</h3>
-            <h3>Penalty: {penalty}</h3>
             {/* <h3>Discard Pile</h3>
             <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
               { board!.discardPile?.map((card) => {
@@ -283,54 +279,77 @@ export default function App() {
                 })
               }
             </div> */}
+            <h3>Turn: {players.find(p => p.turn === turn)!.name}</h3>
+            <h3>Penalty: {penalty}</h3>
+            
             
             <h3>Active Card</h3>
             <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-              <div style={{ background: board!.activeColor}} className='cardComponent'></div>
+              <div style={{ background: board!.activeColor, cursor: 'context-menu'}} className='cardComponent'></div>
               <CardComponent card={board!.activeCard} />
             </div>
         
-            {/* TODO - Ver solo mi mano, y no la de los otros jugadores */}
             <h3>Hands {gameDirection === CLOCKWISE ? '⬇️' : '⬆️'}</h3>
-            <div className='hands'>
+
+            {/* Oponent Hand */}
+            <section className='hands'>
               {
-                Object.entries(board!.hands).map(([playerId, hand], _ ) => {
-                  const playerTurn = players.find(p => p.id === playerId)!.turn
-                  console.log(playerTurn);
+                Object.entries(board!.hands).filter(([playerId, _]) => playerId !== playerRef.current.id).map(([playerId, hand], _ ) => {
+                  // Object.entries(board!.hands).map(([playerId, hand], _ ) => {
+                  // const playerTurn = players.find(p => p.id === playerId)!.turn
                   
                   return (
-                    <div key={playerId} className='hand'>
+                  <div key={playerId} className='handBlock'>
+                    <h4>{players.find(p => p.id === playerId)!.name}</h4>
+                    <div className='hand'>
                       {
                         hand.map((card) => {
                           const { key } = card
                           return (
-                            <CardComponent key={key} card={card} playerTurn={playerTurn} playerId={playerId} discardCard={discardCard}  />
+                            <CardComponent key={key} />
                           )
                         })
                       }
-                      {
-                        ((turn === playerTurn) && (penalty === 0)) 
-                        && (
-                          <button onClick={() => handleDrawCard(playerId)} className='stealthCardBtn' >
-                            Robar Carta
-                          </button>
-                        )
-                      }
-                      {
-                        ((turn === playerTurn) && (penalty > 0)) 
-                        && (
-                          <button className='stealthCardBtn'
-                            onClick={() => { drawPenaltyCards(playerTurn, playerId) }}
-                          >
-                            Robar {penalty} Cartas
-                          </button>
-                        )
-                      }
                     </div>
+                  </div>
                   )
                 })
               }
-            </div>
+            </section>
+
+            {/* User Hand */}
+            <section className='hands handBlock UserHand'>
+              <h4>{playerRef.current.name}</h4>
+              <div className='hand'>
+                {
+                  board!.hands[playerRef.current.id].map((card) => {
+                    const {id, turn} = playerRef.current
+                    const { key } = card
+                    return (
+                      <CardComponent key={key} card={card} playerTurn={turn} playerId={id} discardCard={discardCard}  />
+                    )
+                  })
+                }
+                {
+                  ((turn === playerRef.current.turn) && (penalty === 0)) 
+                  && (
+                    <button onClick={() => handleDrawCard(playerRef.current.id)} className='stealthCardBtn' >
+                      Robar Carta
+                    </button>
+                  )
+                }
+                {
+                  ((turn === playerRef.current.turn) && (penalty > 0)) 
+                  && (
+                    <button className='stealthCardBtn'
+                      onClick={() => { drawPenaltyCards(playerRef.current.turn, playerRef.current.id) }}
+                    >
+                      Robar {penalty} Cartas
+                    </button>
+                  )
+                }
+              </div>
+            </section>
           </>
         )
       }
