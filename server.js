@@ -1,0 +1,72 @@
+import express from 'express'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+// import cors from 'cors'
+
+const app = express()
+const server = createServer(app)
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+})
+
+let gameState = {
+  hands: [], // Card[][]
+  remainingDeck: [], // Card[]
+  discardPile: [], // Card[]
+  activeCard: null, // Card
+  activeColor: undefined, // Color | undefined
+  turn: 0, // number
+  penalty: 0, // number
+  gameDirection: 'Clockwise', // 'Clockwise' | 'CounterClockwise'
+  players: [], // Player[]
+}
+
+io.on('connection', (socket) => {
+  console.log(`Jugador conectado: ${socket.id}`);
+
+  socket.on('joinGame', (playerName) => {
+    if (gameState.players.length < 4) {
+      const player = gameState.players.find(p => p.id === socket.id)
+      if (!player) 
+        gameState.players.push({ id: socket.id, name: playerName, turn: 0 })
+        
+      gameState.players.forEach((player, index) => {
+        player.turn = index
+      })
+
+      socket.emit('gameState', {...gameState, id: socket.id}) 
+      io.emit('updatePlayers', gameState.players)
+      console.log(gameState)
+    }
+  })
+
+  socket.on('startGame', (data) => {
+    gameState = { ...data }
+
+    let gameStart = false
+    if (gameState.players.length > 1)
+      gameStart = true
+
+    io.emit('gameState', {...gameState, gameStart})
+  })
+
+  socket.on('endTurn', (data) => {
+    gameState = { ...gameState, ...data }
+    io.emit('gameState', gameState)
+  })
+
+  socket.on('drawCard', ({ hands, remainingDeck, discardPile }) => {
+    io.emit('gameState', { ...gameState, hands, remainingDeck, discardPile })
+  })
+
+  socket.on('disconnect', () => {
+    gameState.players = gameState.players.filter((player) => player.id !== socket.id)
+    io.emit('updatePlayers', gameState.players)
+    console.log(`Jugador desconectado: ${socket.id}`);
+  })
+})
+
+server.listen(3001, () => console.log('Servidor corriendo en el puerto 3001'))

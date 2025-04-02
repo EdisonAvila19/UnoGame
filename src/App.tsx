@@ -1,77 +1,87 @@
 import './App.css'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 
-import { CardType, type Card, Color, COLORS, generateDeck, SPECIAL_CARDS, WILD_CARDS } from './game/deck'
+import { CardType, type Card, type Color, COLORS, generateDeck, SPECIAL_CARDS, WILD_CARDS } from './game/deck'
 import { dealCards } from './game/deal'
 
 import { Card as CardComponent } from './components/card'
 import { shuffle } from './game/shuffle'
 
-function calculateDecksNeeded(numPlayers: number, CARDS_PER_PLAYER: number) {
-  const CARDS_PER_DECK = 108
-  const MIN_REMAINING_CARDS = 50
+import { calculateDecksNeeded } from './game/calculateNumberDecks'
 
-  let numDecks = 1
+import { type Board, GameDirection, type GameDirectionType, type Player } from './types/game'
 
-  while (true) {
-    const totalCards = numDecks * CARDS_PER_DECK
-    const cardsDealt = numPlayers * CARDS_PER_PLAYER
-    const remainingCards = totalCards - cardsDealt
+import { socket } from './services/socket'
+import useGameSocket from './hooks/useGameSocket'
 
-    if (remainingCards >= MIN_REMAINING_CARDS) {
-      return numDecks
-    }
 
-    numDecks++
-  }
-}
+const { CLOCKWISE, COUNTER_CLOCKWISE } = GameDirection
 
 export default function App() {
-  const NumberOfPlayers = 3
   const NumberOfCardsPerPlayer = 7
-  const amountOfDecks = calculateDecksNeeded(NumberOfPlayers, NumberOfCardsPerPlayer)
-  
+
   const [turn, setTurn] = useState <number> (0)
   const [penalty, setPenalty] = useState <number> (0)
-  const [gameDirection, setGameDirection] = useState <'Clockwise' | 'CounterClockwise'> ('Clockwise')
+  const [gameDirection, setGameDirection] = useState <GameDirectionType> (CLOCKWISE)
 
   const [showColorModal, setShowColorModal] = useState<boolean>(false)
   const [resolveColor, setResolveColor] = useState<((color: Color) => void) | null>(null);
 
-  const [board, setBoard] = useState(() => {
-    const deck = generateDeck(amountOfDecks)
-    const { hands, remainingDeck, activeCard, discardPile } = dealCards(deck, NumberOfPlayers, NumberOfCardsPerPlayer)
-    const activeColor = activeCard.color
+  const [board, setBoard] = useState({} as Board | undefined)
 
-    return { hands, remainingDeck, discardPile, activeCard, activeColor }
-  })
+  const playerNameRef = useRef<{ id: string; name: string; turn: number }>({
+    id: '',
+    name: '',
+    turn: 0
+  });
 
-  const endTurn = (
-    playerIndex: number, 
-    direction: 'Clockwise' | 'CounterClockwise' = gameDirection, 
-    isBlocked: boolean = false 
-  ) => {
-    
-    let nextPlayer
+  const [players, setPlayers] = useState<Player[]>([]);
 
-    if (direction === 'Clockwise') {
-      nextPlayer = ( playerIndex + 1 ) % NumberOfPlayers
-    } else {
-      nextPlayer = ( playerIndex - 1 + NumberOfPlayers ) % NumberOfPlayers
+  const [gameStart, setGameStart] = useState<boolean>(false)
+
+  useGameSocket({ setBoard, setTurn, setPenalty, setGameDirection, setPlayers, updatePlayer, setGameStart })
+  
+  useEffect(()=> {
+    console.log(board)
+    if (!board) return
+
+    console.log('hands: ')
+    console.log(board.hands);
+  }, [board])
+  
+  // Started Game
+  const joinGame = () => {
+    if (playerNameRef) {
+      socket.emit('joinGame', playerNameRef.current.name)
     }
-
-    if (isBlocked) {
-      if (direction === 'Clockwise') {
-        nextPlayer = ( nextPlayer + 1 ) % NumberOfPlayers
-      } else {
-        nextPlayer = ( nextPlayer - 1 + NumberOfPlayers ) % NumberOfPlayers
-      }
-    }
-
-    setTurn(nextPlayer)
   }
 
-  const drawCard = (playerIndex: number, amount:number = 1) => {
+  const startGame = () => {
+    const NumberOfPlayers = players.length
+    const amountOfDecks = calculateDecksNeeded(NumberOfPlayers, NumberOfCardsPerPlayer)
+
+    const deck = generateDeck(amountOfDecks)
+    const { hands, remainingDeck, activeCard, discardPile } = dealCards(deck, players, NumberOfCardsPerPlayer)
+    const activeColor = activeCard.color
+
+    const newGameState = {
+      hands,
+      remainingDeck,
+      discardPile,
+      activeCard,
+      activeColor,
+      turn,
+      penalty,
+      gameDirection,
+      players
+    }
+
+    socket.emit('startGame', newGameState)
+  }
+
+  // In Game
+  const drawCard = (playerIndex: string, amount:number = 1): Board | undefined => {
+    if (!board) return board
     let remainingDeck = [...board.remainingDeck]
     let discardPile = [...board.discardPile]
 
@@ -85,14 +95,97 @@ export default function App() {
     }
     
     // add the card to the player's hand
-    const newHands = [...board.hands]
+    const newHands = {...board.hands}
     for (let i = 0; i < amount; i++) {
       newHands[playerIndex].push(remainingDeck.shift()!)
     }
     
-    setBoard({ ...board, hands: newHands, remainingDeck, discardPile })
+    return { ...board, hands: newHands, remainingDeck, discardPile }
   }
 
+  const drawPenaltyCards = (playerTurn: number, playerId: string) => {
+    const newBoard = drawCard(playerId, penalty);
+    const nextPlayer =  endTurn(playerTurn)
+    socket.emit('endTurn', { ...newBoard, turn: nextPlayer, penalty: 0 })
+  }
+
+  const discardCard = async (card: Card, playerTurn: number, playerId: string) => {
+    //TODO Regla del 0
+    //TODO Regla del 7
+
+    const { hands, discardPile, activeCard, activeColor } = board!
+    const currentColor = activeColor
+    const currentValue = activeCard.value
+  
+    const isWildCard = card.type === CardType.WILD
+    // console.log({isWildCard})
+
+    const isValidCard = card.color === currentColor || card.value === currentValue
+    // console.log({isValidCard})
+    
+
+    // Si otro jugador intenta jugar fuera de su turno
+    if (playerTurn !== turn) {
+      if (!isValidCard) {
+        const newBoard = drawCard(playerId, 2)
+        socket.emit('drawCard', newBoard)
+        return
+      }
+    }
+  
+    // Aplicar penalización si corresponde
+    if (penalty > 0 && card.value !== currentValue) {
+      const newBoard = drawCard(playerId, penalty)
+      const nextPlayer = endTurn(playerTurn)
+      socket.emit('endTurn', { ...newBoard, turn: nextPlayer, penalty: 0 })
+      return
+    }
+  
+    // Si la carta jugada no es válida, el jugador roba por intentar poner una carta invalida, pero sigue el turno
+    if (!isWildCard && !isValidCard) {
+      const newBoard = drawCard(playerId, 2)
+      socket.emit('drawCard', newBoard)
+      // const nextPlayer = endTurn(playerIndex)
+      return
+    }
+  
+    // Remover la carta de la mano del jugador
+    // const newHands = Object.entries(hands).map(([_, hand], playerTurn ) =>
+    //   playerTurn === turn ? hand.filter(c => c.key !== card.key) : hand
+    // )
+    const newHands = {...hands}
+    newHands[playerId] = newHands[playerId].filter(c => c.key !== card.key)
+  
+    // Agregar la carta al montón de descartes
+    const newDiscardPile = [...discardPile, card]
+  
+    // Determinar el nuevo color activo (🌈 o +4)
+    
+    let newActiveColor = card.color 
+    if (!newActiveColor) {
+      newActiveColor = await getPlayerChosenColor()
+    }
+  
+    // Aplicar penalización si es +2 o +4
+    let newPenalty = penalty
+    if (card.value === WILD_CARDS.DRAW_FOUR || card.value === SPECIAL_CARDS.DRAW_TWO) {
+      newPenalty = penalty + (card.value === '+2' ? 2 : 4)
+    }
+  
+    // Cambiar dirección si es 🔄️
+    let newGameDirection = gameDirection
+    if (card.value === SPECIAL_CARDS.REVERSE) {
+      newGameDirection = gameDirection === CLOCKWISE ? COUNTER_CLOCKWISE : CLOCKWISE
+    }
+  
+    // Si la carta es 🚫, el siguiente jugador pierde el turno
+    const nextPlayer = endTurn(playerTurn, newGameDirection, card.value === SPECIAL_CARDS.SKIP)
+
+    // Enviar nuevos estados al servidor
+    socket.emit('endTurn', { ...board, hands: newHands, discardPile: newDiscardPile, activeCard: card, activeColor: newActiveColor, turn: nextPlayer, penalty: newPenalty })
+  }
+
+  // Choose Color Modal
   const getPlayerChosenColor = () => {
     return new Promise<Color>((resolve) => {
       setShowColorModal(true);
@@ -108,149 +201,139 @@ export default function App() {
     }
   }, [resolveColor])
 
-  const discardCard = async (card: Card, playerIndex: number) => {
-    //TODO Regla del 0
-    //TODO Regla del 7
-
-    const { activeCard, activeColor, hands, discardPile } = board
-    const currentColor = activeColor
-    const currentValue = activeCard.value
-  
-    const isWildCard = card.type === CardType.WILD
-    console.log({isWildCard})
-
-    const isValidCard = card.color === currentColor || card.value === currentValue
-    console.log({isValidCard})
+  // End Turn
+  const endTurn = (
+    playerTurn: number, 
+    direction: GameDirectionType = gameDirection, 
+    isBlocked: boolean = false 
+  ): number => {
     
+    let nextPlayer
 
-    // Si otro jugador intenta jugar fuera de su turno
-    if (playerIndex !== turn) {
-      if (!isValidCard) {
-        drawCard(playerIndex, 2)
-        return
+    if (direction === CLOCKWISE) {
+      nextPlayer = ( playerTurn + 1 ) % players.length
+    } else {
+      nextPlayer = ( playerTurn - 1 + players.length ) % players.length
+    }
+
+    if (isBlocked) {
+      if (direction === CLOCKWISE) {
+        nextPlayer = ( nextPlayer + 1 ) % players.length
+      } else {
+        nextPlayer = ( nextPlayer - 1 + players.length ) % players.length
       }
     }
-  
-    // Aplicar penalización si corresponde
-    if (penalty > 0 && card.value !== currentValue) {
-      drawCard(playerIndex, penalty)
-      setPenalty(0)
-      endTurn(playerIndex)
-      return
-    }
-  
-    // Si la carta jugada no es válida, el jugador roba por intentar poner una carta invalida, pero sigue el turno
-    if (!isWildCard && !isValidCard) {
-      drawCard(playerIndex, 2)
-      // endTurn(playerIndex)
-      return
-    }
-  
-    // Remover la carta de la mano del jugador
-    const newHands = hands.map((hand, i) =>
-      i === playerIndex ? hand.filter(c => c.key !== card.key) : hand
-    )
-  
-    // Agregar la carta al montón de descartes
-    const newDiscardPile = [...discardPile, card]
-  
-    // Determinar el nuevo color activo (🌈 o +4)
-    
-    let newActiveColor = card.color 
-    if (!newActiveColor) {
-      newActiveColor = await getPlayerChosenColor()
-    }
-  
-    // Aplicar penalización si es +2 o +4
-    if (card.value === WILD_CARDS.DRAW_FOUR || card.value === SPECIAL_CARDS.DRAW_TWO) {
-      setPenalty(prev => prev + (card.value === '+2' ? 2 : 4))
-    }
-  
-    // Cambiar dirección si es 🔄️
-    let newGameDirection = gameDirection
-    if (card.value === SPECIAL_CARDS.REVERSE) {
-      newGameDirection = gameDirection === 'Clockwise' ? 'CounterClockwise' : 'Clockwise'
-      setGameDirection(newGameDirection)
-    }
-  
-    // Actualizar el estado del tablero
-    setBoard({ ...board, hands: newHands, discardPile: newDiscardPile, activeCard: card, activeColor: newActiveColor })
-  
-    // Si la carta es 🚫, el siguiente jugador pierde el turno
-    endTurn(playerIndex, newGameDirection, card.value === SPECIAL_CARDS.SKIP)
+
+    return nextPlayer
+  }
+
+  const handleDrawCard = (playerIndex: string) => {
+    const newBoard = drawCard(playerIndex); 
+    socket.emit('drawCard', newBoard);
+  }
+
+  const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    playerNameRef.current.name = e.target.value
+  }
+
+  function updatePlayer (player: Player) {
+    playerNameRef.current = {...playerNameRef.current, ...player }
   }
 
   return (
     <main>
-      {/* <h3>Remaining Deck</h3>
-      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
-        {
-          board.remainingDeck.map((card) => {
-            const { key } = card
-            return (
-              <CardComponent key={key} card={card} />
-            )
-          })
-        }
-      </div> */}
 
-      <h3>Turn: {turn}</h3>
-      <h3>Penalty: {penalty}</h3>
-      <h3>Discard Pile</h3>
-      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
-        {
-          board.discardPile.map((card) => {
-            const { key } = card
-            return (
-              <CardComponent key={key} card={card} />
-            )
-          })
-        }
-      </div>
-      
-      <h3>Active Card</h3>
-      <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-        <div style={{ background: board.activeColor}} className='cardComponent'></div>
-        <CardComponent card={board.activeCard} />
-      </div>
-
-      <h3>Hands {gameDirection === 'Clockwise' ? '⬇️' : '⬆️'}</h3>
-      <div className='hands'>
-        {
-          board.hands.map((hand, index) => {
-            return (
-              <div key={index} className='hand'>
-                {
-                  hand.map((card) => {
-                    const { key } = card
-                    return (
-                      <CardComponent key={key} card={card} playerIndex={index} discardCard={discardCard}  />
-                    )
-                  })
-                }
-                {
-                  ((turn === index) && (penalty === 0)) 
-                  && (
-                    <button onClick={() => drawCard(index)} className='stealthCardBtn' >
-                      Robar Carta
-                    </button>
+      <h2>Juego de Uno</h2>
+      {
+        (playerNameRef && !gameStart) &&
+        (
+          <>
+            <input type="text" defaultValue={playerNameRef.current.name} onChange={handleChangeName} />
+            <button onClick={joinGame}>Unirse al juego</button>
+            {
+              players.length > 1 && <button onClick={startGame}>Comenzar el juego</button>
+            }
+          </>
+        )
+      }
+      {
+        gameStart && (
+          <>
+            {/* <h3>Remaining Deck</h3>
+            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
+              {
+                board.remainingDeck.map((card) => {
+                  const { key } = card
+                  return (
+                    <CardComponent key={key} card={card} />
                   )
-                }
-                {
-                  ((turn === index) && (penalty > 0)) 
-                  && (
-                    <button className='stealthCardBtn'
-                      onClick={() => {drawCard(index, penalty); setPenalty(0); endTurn(index)}}
-                    >
-                      Robar {penalty} Cartas
-                    </button>
+                })
+              }
+            </div> */}
+        
+            <h3>Turn: {turn}</h3>
+            <h3>Penalty: {penalty}</h3>
+            {/* <h3>Discard Pile</h3>
+            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
+              { board!.discardPile?.map((card) => {
+                  const { key } = card
+                  return (
+                    <CardComponent key={key} card={card} />
                   )
-                }
-              </div>
-            )
-          })
-        }
-      </div>
+                })
+              }
+            </div> */}
+            
+            <h3>Active Card</h3>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+              <div style={{ background: board!.activeColor}} className='cardComponent'></div>
+              <CardComponent card={board!.activeCard} />
+            </div>
+        
+            {/* TODO - Ver solo mi mano, y no la de los otros jugadores */}
+            <h3>Hands {gameDirection === CLOCKWISE ? '⬇️' : '⬆️'}</h3>
+            <div className='hands'>
+              {
+                Object.entries(board!.hands).map(([playerId, hand], _ ) => {
+                  const playerTurn = players.find(p => p.id === playerId)!.turn
+                  console.log(playerTurn);
+                  
+                  return (
+                    <div key={playerId} className='hand'>
+                      {
+                        hand.map((card) => {
+                          const { key } = card
+                          return (
+                            <CardComponent key={key} card={card} playerTurn={playerTurn} playerId={playerId} discardCard={discardCard}  />
+                          )
+                        })
+                      }
+                      {
+                        ((turn === playerTurn) && (penalty === 0)) 
+                        && (
+                          <button onClick={() => handleDrawCard(playerId)} className='stealthCardBtn' >
+                            Robar Carta
+                          </button>
+                        )
+                      }
+                      {
+                        ((turn === playerTurn) && (penalty > 0)) 
+                        && (
+                          <button className='stealthCardBtn'
+                            onClick={() => { drawPenaltyCards(playerTurn, playerId) }}
+                          >
+                            Robar {penalty} Cartas
+                          </button>
+                        )
+                      }
+                    </div>
+                  )
+                })
+              }
+            </div>
+          </>
+        )
+      }
       {
         showColorModal &&
         <div className="modal">

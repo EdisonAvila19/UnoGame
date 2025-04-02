@@ -1,14 +1,20 @@
 import type { Card } from './deck'
+import type { Player, Hands } from '../types/game'
 
-export function dealCards(deck: Card[], numPlayers: number, cardsPerPlayer: number) {
-  const hands: Card[][] = Array.from({ length: numPlayers }, () => [])
+export function dealCards(deck: Card[], players: Player[], cardsPerPlayer: number) {
+  // const numPlayers = players.length
+
+  const hands: Hands = {}
   const remainingDeck = [...deck]
   const discardPile: Card[] = []
 
   for (let i = 0; i < cardsPerPlayer; i++) {
-    for (const hand of hands) {
+    for (const hand of players) {
       if (remainingDeck.length > 0) {
-        hand.push(remainingDeck.shift()!)
+        if (!hands[hand.id]) 
+          hands[hand.id] = [remainingDeck.shift()!]
+        else
+          hands[hand.id].push(remainingDeck.shift()!)
       }
     }
   }
@@ -21,5 +27,7 @@ export function dealCards(deck: Card[], numPlayers: number, cardsPerPlayer: numb
     discardPile.push(activeCard)
   }
 
+  console.log(hands);
+  
   return { hands, remainingDeck, activeCard, discardPile }
 }
