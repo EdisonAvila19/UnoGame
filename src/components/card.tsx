@@ -1,4 +1,7 @@
 import type { Card as CardType } from '../game/deck'
+import { WILD_CARDS } from '../game/deck'
+
+const { CHANGE_COLOR } = WILD_CARDS
 
 interface CardProps {
   readonly card?: CardType
@@ -6,13 +9,6 @@ interface CardProps {
   readonly playerId?: string
   readonly discardCard?: (card: CardType, playerTurn: number, playerId: string) => void
   readonly className?: string
-}
-
-const renderColors = {
-  'blue': '#0185c8',
-  'red': '#fe2626',
-  'green': '#3dc400',
-  'yellow': '#febe00',
 }
 
 export function Card({ card, playerTurn, playerId, discardCard, className }: CardProps) {
@@ -23,12 +19,14 @@ export function Card({ card, playerTurn, playerId, discardCard, className }: Car
 
   const { value, color } = card
   const fontColor = color === 'blue' ? 'white' : 'black'
+  
 
-
-  const render = color ? renderColors[color] : '#808080' 
+  const renderColor = color 
+    ? `var(--${color})` 
+    : 'linear-gradient(145deg, var(--red), var(--yellow), var(--green), var(--blue))'
 
   const cardStyles: {background: string, color: string, cursor?: string} = {
-    background: render,
+    background: renderColor,
     color: fontColor,
     cursor: 'pointer'
   }
@@ -45,7 +43,11 @@ export function Card({ card, playerTurn, playerId, discardCard, className }: Car
       data-key={card.key}
       className={cardClass}
       style={cardStyles}>
-      {value}
+      {
+        value === CHANGE_COLOR 
+          ? ''
+          : value
+      }
     </button>
   )
 }

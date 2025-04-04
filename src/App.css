@@ -1,3 +1,10 @@
+:root {
+  --blue: #0185c8;
+  --red: #fe2626;
+  --green: #3dc400;
+  --yellow: #febe00;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -7,7 +14,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   height: auto;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 4px #00000080;
   background: linear-gradient(180deg, #0a192f 0%, #1e3a5f 100%);
   color: #F0FFF0;
 }
@@ -19,37 +26,37 @@ main {
   justify-content: center;
 }
 .bgblue {
-  background: linear-gradient(180deg, rgba(0,40,72,1) 0%, rgba(3,94,161,1) 53%, rgba(0,40,72,1) 100%);
+  background: linear-gradient(180deg, #002848 0%, #035ea1 53%, #002848 100%);
   color: #589fcf;
 }
 .bgred {
-  background: linear-gradient(180deg, rgba(128, 10, 10, 1) 0%, rgba(254, 38, 38, 1) 53%, rgba(128, 10, 10, 1) 100%);
+  background: linear-gradient(180deg, #800a0a 0%, #fe2626 53%, #800a0a 100%);
   color: #FFF5F5;
 }
 .bggreen {
-  background: linear-gradient(180deg, rgba(20, 100, 0, 1) 0%, rgba(61, 196, 0, 1) 53%, rgba(20, 100, 0, 1) 100%);
+  background: linear-gradient(180deg, #146400 0%, #3dc400 53%, #146400 100%);
   color: #F0FFF0;
 }
 .bgyellow {
-  background: linear-gradient(180deg, rgba(150, 100, 0, 1) 0%, rgba(254, 190, 0, 1) 53%, rgba(150, 100, 0, 1) 100%);
+  background: linear-gradient(180deg, #966400 0%, #febe00 53%, #966400 100%);
   color: #3A2F00;
 }
 
 h1 {
   /* position: absolute; */
-  font-size: 5rem;
+  font-size: 7rem;
   font-weight: bold;
   text-transform: uppercase;
-  background: linear-gradient(145deg, #ff0000, #ffcc00, #00cc00, #0066ff);
+  background: linear-gradient(145deg, var(--red), var(--yellow), var(--green), var(--blue));
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4), -1px -1px 2px rgba(255, 255, 255, 0.5); /* Efecto de profundidad */
+  text-shadow: 3px 3px 5px #00000066, -1px -1px 2px #ffffff80; Efecto de profundidad
   letter-spacing: 5px;
   transform: rotate(-15deg);
   height: fit-content;
   margin-right: 60px;
-  filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.5)); /* Efecto 3D */
+  filter: drop-shadow(3px 3px 5px #00000080); Efecto 3D
   top: -10px;
 }
 
@@ -110,7 +117,7 @@ h1 {
   justify-content: space-evenly;
 }
 .game-info h3 {
-  color: #F0FFF0;
+  /* color: #F0FFF0; */
 }
 
 .modal {
@@ -128,12 +135,11 @@ h1 {
 .modal-background {
   position: absolute;
   top: 0;
-  left: -20px;
+  left: 0px;
   width: 100vw;
   min-height: 100vh;
   height: 100%;
-  background: black;
-  opacity: 0.5;
+  background: rgba(0, 0, 0, 0.7); /* Negro con 50% de opacidad */
 }
 
 .modal-content {

@@ -13,7 +13,7 @@ export function ColorModal ({ changeColor }: ColorModalProps)  {
         <h2>Elige un color</h2>
         <div >
           {COLORS.map((color) => (
-            <button key={color} onClick={() => changeColor(color)} style={{background: color}} ></button>
+            <button key={color} onClick={() => changeColor(color)} style={{background: `var(--${color})`}} ></button>
           ))}
         </div>
       </div>

@@ -23,16 +23,6 @@ export interface Board {
     activeColor?: Color;
 }
 
-export interface UseGameSocketProps {
-  setBoard: React.Dispatch<React.SetStateAction<Board | undefined>>;
-  setTurn: (turn: number) => void;
-  setPenalty: (penalty: number) => void;
-  setGameDirection: (gameDirection: GameDirectionType) => void;
-  setPlayers: React.Dispatch<React.SetStateAction<Player[]>>;
-  setGameStart: React.Dispatch<React.SetStateAction<boolean>>;
-  updatePlayer: (player: Player) => void
-}
-
 export interface GameState extends Board {
   turn: number,
   penalty: number,
@@ -41,3 +31,4 @@ export interface GameState extends Board {
   gameStart?: boolean,
   id?: string
 }
+

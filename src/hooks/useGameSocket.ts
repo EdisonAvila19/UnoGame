@@ -1,12 +1,28 @@
-import { useEffect } from 'react'
+import { useEffect, useContext } from 'react'
+import { GameContext } from '../context/game'
+
 import { socket } from '../services/socket'
 
-import type { UseGameSocketProps, GameState } from '../types/game'
+import type { GameState, Player } from '../types/game'
 
-export default function useGameSocket ({ setBoard, setTurn, setPenalty, setGameDirection, setPlayers, updatePlayer, setGameStart }: UseGameSocketProps) {
+import { generateDeck } from '../game/deck'
+import { calculateDecksNeeded } from '../game/calculateNumberDecks'
+import { dealCards } from '../game/deal'
+
+
+export interface UseGameSocketProps {
+  updatePlayer: (player: Player) => void
+  playerRef: React.RefObject<Player>
+  NumberOfCardsPerPlayer: number
+}
+
+export default function useGameSocket ({ updatePlayer, playerRef, NumberOfCardsPerPlayer }: UseGameSocketProps) {
+
+  const { board, setBoard, turn, setTurn, penalty, setPenalty, gameDirection, setGameDirection, gameStart, setGameStart, players, setPlayers } = useContext(GameContext)!
 
   useEffect(() => {
-    socket.on('gameState', (data: GameState) => {
+
+    const handleGameState = (data: GameState) => {
       const { players, turn, penalty, gameDirection, gameStart, id, ...rest} = data
       setBoard(rest)
       setTurn(turn)
@@ -18,15 +34,61 @@ export default function useGameSocket ({ setBoard, setTurn, setPenalty, setGameD
         if (!newPlayer) return
         updatePlayer(newPlayer)
       }
-    })
-
-    socket.on('updatePlayers', (players) => {
+    }
+    
+    const handleUpdatePlayers = (players: Player[]) => {
       setPlayers(players)
-    })
+    }
+
+    socket.off('gameState')
+    socket.off('updatePlayers')
+
+    socket.on('gameState', handleGameState)
+    socket.on('updatePlayers', handleUpdatePlayers)
 
     return () => {
       socket.off('gameState')
       socket.off('updatePlayers')
     }
   }, [])
+
+  const joinGame = () => {
+    if (playerRef) {
+      socket.emit('joinGame', playerRef.current.name)
+    }
+  }
+
+  const startGame = () => {
+    const NumberOfPlayers = players.length
+    const amountOfDecks = calculateDecksNeeded(NumberOfPlayers, NumberOfCardsPerPlayer)
+
+    const deck = generateDeck(amountOfDecks)
+    const { hands, remainingDeck, activeCard, discardPile } = dealCards(deck, players, NumberOfCardsPerPlayer)
+    const activeColor = activeCard.color
+
+    const newGameState = {
+      hands,
+      remainingDeck,
+      discardPile,
+      activeCard,
+      activeColor,
+      turn,
+      penalty,
+      gameDirection,
+      players
+    }
+
+    socket.emit('startGame', newGameState)
+  }
+
+  return {
+    board,
+    gameStart,
+    players,
+    turn,
+    gameDirection,
+    penalty,
+    joinGame,
+    startGame
+  }
 }
