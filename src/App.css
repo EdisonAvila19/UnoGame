@@ -16,6 +16,7 @@ main {
   padding: 20px;
   min-height: 100vh;
   display: flex;
+  justify-content: center;
 }
 .bgblue {
   background: linear-gradient(180deg, rgba(0,40,72,1) 0%, rgba(3,94,161,1) 53%, rgba(0,40,72,1) 100%);
@@ -35,18 +36,21 @@ main {
 }
 
 h1 {
-  font-size: 4rem;
+  /* position: absolute; */
+  font-size: 5rem;
   font-weight: bold;
   text-transform: uppercase;
   background: linear-gradient(145deg, #ff0000, #ffcc00, #00cc00, #0066ff);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  letter-spacing: 3px;
-  transform: rotate(339deg);
+  text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4), -1px -1px 2px rgba(255, 255, 255, 0.5); /* Efecto de profundidad */
+  letter-spacing: 5px;
+  transform: rotate(-15deg);
   height: fit-content;
   margin-right: 60px;
+  filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.5)); /* Efecto 3D */
+  top: -10px;
 }
 
 .welcome-message {
@@ -60,8 +64,28 @@ h1 {
   font-family: 'Segoe UI', sans-serif;
   text-align: center;
   max-width: 300px;
-
   height: fit-content;
+  margin-top: 60px;
+}
+
+.welcome-message .input-text {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.welcome-message .input-text input {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: 2px solid #ffa500; /* Naranja */
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.welcome-message.input-text input:focus {
+  border-color: #ff7b00; /* Un tono más oscuro al enfocar */
+  box-shadow: 0 0 8px rgba(255, 165, 0, 0.5);
 }
 
 .welcome-message p {
@@ -74,16 +98,19 @@ h1 {
 }
 
 .game-board {
-  position: absolute;
   margin-top: 20px;
+  width: 800px;
 }
 
 .game-info {
-  margin-left: 200px;
+  /* margin-left: 200px; */
   display: flex;
   gap: 50px;
   align-items: center;
   justify-content: space-evenly;
+}
+.game-info h3 {
+  color: #F0FFF0;
 }
 
 .modal {
@@ -225,11 +252,19 @@ h1 {
 
 .handBlock {
   display: flex;
+  flex-direction: column;
   gap: 20px;
+  margin-top: 60px;
+  padding: 20px;
+  margin-right: 20px;
+  background: rgb(0 0 0 / 20%);
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .UserHand h4 {
-  margin-top: 80px;
+  margin-top: 0;
   text-align: center;
   font-size: 35px;
 }

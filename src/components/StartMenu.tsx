@@ -19,10 +19,10 @@ export function StartMenu ({ playerRef, players, joinGame, startGame, handleChan
     <section className='start-menu welcome-message'>
       {
         !playerRef.current.name ? (
-          <>
+          <div className='input-text'>
             <input type="text" defaultValue={playerRef.current.name} onChange={handleChangeName} />
-            <button onClick={joinGame}>Unirse al juego</button>
-          </>
+            <button className='btn' onClick={joinGame}>Unirse al juego</button>
+          </div>
         ) : (
           <>
             <p>Hola <strong>{playerRef.current.name}</strong></p>

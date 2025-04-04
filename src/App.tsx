@@ -241,33 +241,31 @@ export default function App() {
     playerRef.current = {...playerRef.current, ...player }
   }
 
-  const colorPicker = {
-    'blue': '',
-    'red': '',
-    'green': '',
-    'yellow': '',
-  }
-  
   return (
     <main className={board?.activeColor && 'bg' + board.activeColor}>
-      <h1>UNO</h1>
+      {/* <h1>UNO</h1> */}
       {
-        (playerRef && !gameStart) &&
-          <StartMenu 
-            playerRef={playerRef} 
-            players={players} 
-            joinGame={joinGame} 
-            startGame={startGame} 
-            handleChangeName={handleChangeName} 
-          />
+        (playerRef && !gameStart) && (
+          <>
+            <h1>UNO</h1>
+            <StartMenu 
+              playerRef={playerRef} 
+              players={players} 
+              joinGame={joinGame} 
+              startGame={startGame} 
+              handleChangeName={handleChangeName} 
+            />
+          </>
+        )
       }
       {
         gameStart && (
           <section className='game-board'>
             <div className='game-info'>
+              <h1>UNO</h1>
               <CardComponent card={board!.activeCard} className="big-card" />
               <div>
-                <h3>Es el turno de: {players.find(p => p.turn === turn)!.name}</h3>
+                <h3>Es el turno de: <strong>{players.find(p => p.turn === turn)!.name}</strong></h3>
                 <h3>Dirección del juego: {gameDirection === CLOCKWISE ? '⬇️' : '⬆️'}</h3>
                 { penalty > 0 && <h3>Penalización: {penalty}</h3> }
               </div>
@@ -311,24 +309,24 @@ export default function App() {
             </section>
 
             {/* Oponent Hand */}
-            <h3>Manos del oponente</h3>
+            <h3>Oponentes</h3>
             <section className='hands oponetsHand'>
               {
                 Object.entries(board!.hands).filter(([playerId, _]) => playerId !== playerRef.current.id).map(([playerId, hand], _ ) => {
                   return (
-                  <div key={playerId} className='handBlock'>
-                    <h4>{players.find(p => p.id === playerId)!.name}</h4>
-                    <div className='hand'>
-                      {
-                        hand.map((card) => {
-                          const { key } = card
-                          return (
-                            <CardComponent key={key} />
-                          )
-                        })
-                      }
+                    <div key={playerId} className='handBlock'>
+                      <h4>{players.find(p => p.id === playerId)!.name}</h4>
+                        <div className='hand'>
+                          {
+                            hand.map((card) => {
+                              const { key } = card
+                              return (
+                                <CardComponent key={key} />
+                              )
+                            })
+                          }
+                      </div>
                     </div>
-                  </div>
                   )
                 })
               }
