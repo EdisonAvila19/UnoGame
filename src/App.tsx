@@ -1,10 +1,10 @@
 import './App.css'
 import { useState, useCallback, useRef, useEffect } from 'react'
 
-import { CardType, type Card, type Color, COLORS, generateDeck, SPECIAL_CARDS, WILD_CARDS } from './game/deck'
+import { CardType, type Card, type Color, generateDeck, SPECIAL_CARDS, WILD_CARDS } from './game/deck'
 import { dealCards } from './game/deal'
 
-import { Card as CardComponent } from './components/card'
+import { Card as CardComponent } from './components/Card'
 import { shuffle } from './game/shuffle'
 
 import { calculateDecksNeeded } from './game/calculateNumberDecks'
@@ -14,6 +14,8 @@ import { type Board, GameDirection, type GameDirectionType, type Player } from '
 import { socket } from './services/socket'
 import useGameSocket from './hooks/useGameSocket'
 
+import { ColorModal } from './components/ColorModal'
+import { StartMenu } from './components/StartMenu'
 
 const { CLOCKWISE, COUNTER_CLOCKWISE } = GameDirection
 
@@ -239,65 +241,80 @@ export default function App() {
     playerRef.current = {...playerRef.current, ...player }
   }
 
+  const colorPicker = {
+    'blue': '',
+    'red': '',
+    'green': '',
+    'yellow': '',
+  }
+  
   return (
-    <main>
-
-      <h2>Juego de Uno</h2>
+    <main className={board?.activeColor && 'bg' + board.activeColor}>
+      <h1>UNO</h1>
       {
         (playerRef && !gameStart) &&
-        (
-          <>
-            <input type="text" defaultValue={playerRef.current.name} onChange={handleChangeName} />
-            <button onClick={joinGame}>Unirse al juego</button>
-            {
-              players.length > 1 && <button onClick={startGame}>Comenzar el juego</button>
-            }
-          </>
-        )
+          <StartMenu 
+            playerRef={playerRef} 
+            players={players} 
+            joinGame={joinGame} 
+            startGame={startGame} 
+            handleChangeName={handleChangeName} 
+          />
       }
       {
         gameStart && (
-          <>
-            {/* <h3>Remaining Deck</h3>
-            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
-              {
-                board.remainingDeck.map((card) => {
-                  const { key } = card
-                  return (
-                    <CardComponent key={key} card={card} />
-                  )
-                })
-              }
-            </div> */}
-            {/* <h3>Discard Pile</h3>
-            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '10px' }}>
-              { board!.discardPile?.map((card) => {
-                  const { key } = card
-                  return (
-                    <CardComponent key={key} card={card} />
-                  )
-                })
-              }
-            </div> */}
-            <h3>Turn: {players.find(p => p.turn === turn)!.name}</h3>
-            <h3>Penalty: {penalty}</h3>
-            
-            
-            <h3>Active Card</h3>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-              <div style={{ background: board!.activeColor, cursor: 'context-menu'}} className='cardComponent'></div>
-              <CardComponent card={board!.activeCard} />
+          <section className='game-board'>
+            <div className='game-info'>
+              <CardComponent card={board!.activeCard} className="big-card" />
+              <div>
+                <h3>Es el turno de: {players.find(p => p.turn === turn)!.name}</h3>
+                <h3>Dirección del juego: {gameDirection === CLOCKWISE ? '⬇️' : '⬆️'}</h3>
+                { penalty > 0 && <h3>Penalización: {penalty}</h3> }
+              </div>
             </div>
         
-            <h3>Hands {gameDirection === CLOCKWISE ? '⬇️' : '⬆️'}</h3>
+            {/* User Hand */}
+            <section className='hands handBlock UserHand'>
+              <div className='user-options'>
+                <h4>{playerRef.current.name}</h4>
+                {
+                  ((turn === playerRef.current.turn) && (penalty === 0)) 
+                  && (
+                    <button onClick={() => handleDrawCard(playerRef.current.id)} className='btn' >
+                      Robar Carta
+                    </button>
+                  )
+                }
+                {
+                  ((turn === playerRef.current.turn) && (penalty > 0)) 
+                  && (
+                    <button className='btn'
+                      onClick={() => { drawPenaltyCards(playerRef.current.turn, playerRef.current.id) }}
+                    >
+                      Robar {penalty} Cartas
+                    </button>
+                  )
+                }
+              </div>
+              <div className='hand'>
+                {
+                  board!.hands[playerRef.current.id].map((card) => {
+                    const {id, turn} = playerRef.current
+                    const { key } = card
+                    return (
+                      <CardComponent key={key} card={card} playerTurn={turn} playerId={id} discardCard={discardCard}  />
+                    )
+                  })
+                }
+                
+              </div>
+            </section>
 
             {/* Oponent Hand */}
-            <section className='hands'>
+            <h3>Manos del oponente</h3>
+            <section className='hands oponetsHand'>
               {
                 Object.entries(board!.hands).filter(([playerId, _]) => playerId !== playerRef.current.id).map(([playerId, hand], _ ) => {
-                  // Object.entries(board!.hands).map(([playerId, hand], _ ) => {
-                  // const playerTurn = players.find(p => p.id === playerId)!.turn
-                  
                   return (
                   <div key={playerId} className='handBlock'>
                     <h4>{players.find(p => p.id === playerId)!.name}</h4>
@@ -317,55 +334,12 @@ export default function App() {
               }
             </section>
 
-            {/* User Hand */}
-            <section className='hands handBlock UserHand'>
-              <h4>{playerRef.current.name}</h4>
-              <div className='hand'>
-                {
-                  board!.hands[playerRef.current.id].map((card) => {
-                    const {id, turn} = playerRef.current
-                    const { key } = card
-                    return (
-                      <CardComponent key={key} card={card} playerTurn={turn} playerId={id} discardCard={discardCard}  />
-                    )
-                  })
-                }
-                {
-                  ((turn === playerRef.current.turn) && (penalty === 0)) 
-                  && (
-                    <button onClick={() => handleDrawCard(playerRef.current.id)} className='stealthCardBtn' >
-                      Robar Carta
-                    </button>
-                  )
-                }
-                {
-                  ((turn === playerRef.current.turn) && (penalty > 0)) 
-                  && (
-                    <button className='stealthCardBtn'
-                      onClick={() => { drawPenaltyCards(playerRef.current.turn, playerRef.current.id) }}
-                    >
-                      Robar {penalty} Cartas
-                    </button>
-                  )
-                }
-              </div>
-            </section>
-          </>
+          </section>
         )
       }
       {
         showColorModal &&
-        <div className="modal">
-          <div className='modal-background'></div>
-          <div className='modal-content'>
-            <h2>Elige un color</h2>
-            <div >
-              {COLORS.map((color) => (
-                <button key={color} onClick={() => handleColorSelect(color)} style={{background: color}} ></button>
-              ))}
-            </div>
-          </div>
-        </div>
+          <ColorModal changeColor={handleColorSelect} />
       }
     </main>
   )

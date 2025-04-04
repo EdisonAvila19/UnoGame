@@ -5,6 +5,85 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  height: auto;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, #0a192f 0%, #1e3a5f 100%);
+  color: #F0FFF0;
+}
+
+main {
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+}
+.bgblue {
+  background: linear-gradient(180deg, rgba(0,40,72,1) 0%, rgba(3,94,161,1) 53%, rgba(0,40,72,1) 100%);
+  color: #589fcf;
+}
+.bgred {
+  background: linear-gradient(180deg, rgba(128, 10, 10, 1) 0%, rgba(254, 38, 38, 1) 53%, rgba(128, 10, 10, 1) 100%);
+  color: #FFF5F5;
+}
+.bggreen {
+  background: linear-gradient(180deg, rgba(20, 100, 0, 1) 0%, rgba(61, 196, 0, 1) 53%, rgba(20, 100, 0, 1) 100%);
+  color: #F0FFF0;
+}
+.bgyellow {
+  background: linear-gradient(180deg, rgba(150, 100, 0, 1) 0%, rgba(254, 190, 0, 1) 53%, rgba(150, 100, 0, 1) 100%);
+  color: #3A2F00;
+}
+
+h1 {
+  font-size: 4rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: linear-gradient(145deg, #ff0000, #ffcc00, #00cc00, #0066ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 3px;
+  transform: rotate(339deg);
+  height: fit-content;
+  margin-right: 60px;
+}
+
+.welcome-message {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px 30px;
+  padding-bottom: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  color: #f0f0f0;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+  max-width: 300px;
+
+  height: fit-content;
+}
+
+.welcome-message p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+.welcome-message strong {
+  color: #febe00; /* amarillo para destacar */
+}
+
+.game-board {
+  position: absolute;
+  margin-top: 20px;
+}
+
+.game-info {
+  margin-left: 200px;
+  display: flex;
+  gap: 50px;
+  align-items: center;
+  justify-content: space-evenly;
 }
 
 .modal {
@@ -22,7 +101,9 @@ body {
 .modal-background {
   position: absolute;
   top: 0;
-  width: 100%;
+  left: -20px;
+  width: 100vw;
+  min-height: 100vh;
   height: 100%;
   background: black;
   opacity: 0.5;
@@ -65,23 +146,67 @@ body {
 }
 
 .cardComponent {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 10px;
-  border: 1px solid black;
-  box-sizing: border-box;
-  cursor: pointer;
+  border-radius: 12px;
+  border: 3px solid #000;
+  background: linear-gradient(145deg, #ffffff, #ddd);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.7rem;
+  color: black;
+  user-select: none;
+  transition: transform 0.2s ease-in-out;
 }
 
-.stealthCardBtn {
-  padding: 10px 25px;
-  border: 1px solid black;
-  border-radius: 5px;
-  cursor: pointer;
+.cardComponent:hover {
+  transform: scale(1.05);
+  box-shadow: 6px 6px 10px rgba(0, 0, 0, 0.6);
 }
+
+.big-card {
+  transform: scale(1.5);
+}
+.big-card:hover {
+  transform: scale(1.5);
+}
+
+.opCard:hover {
+  transform: none
+}
+
+.btn {
+  padding: 12px 30px;
+  border: 2px solid black;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: linear-gradient(145deg, #ff8500, #e65c00);
+  color: black;
+  border-color: #111111;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+  height: fit-content;
+}
+
+.btn:hover {
+  background: linear-gradient(145deg, #ff9900, #cc5200);
+  transform: scale(1.05);
+  box-shadow: 6px 6px 10px rgba(0, 0, 0, 0.4);
+}
+
+.btn:active {
+  transform: scale(0.95);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+
 
 .hands {
   display: flex; 
@@ -104,7 +229,24 @@ body {
 }
 
 .UserHand h4 {
-  color: Blue;
+  margin-top: 80px;
   text-align: center;
   font-size: 35px;
+}
+
+.user-options {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding: 8px 12px;
+}
+
+.user-options * {
+  margin-bottom: 20px;
+  max-width: 50%;
+  width: 50%;
+}
+
+.user-options button {
+  width: fit-content;
 }
