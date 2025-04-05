@@ -10,10 +10,10 @@ interface GameInfoProps {
 }
 
 export function Oponentes({ playerRef }: GameInfoProps) {
+  //TODO - Reportar un jugador que no informo que le quedaba una carta y penalizar si se reporta de forma erronea
+  //TODO - Al eliminar al jugador actual, reorganizar el array para que se renderizen en el orden correcto
 
   const { board, players } = useContext(GameContext)!
-  if (!board) return null
-
   return (
     <>
       {/* <h3>Oponentes</h3> */}

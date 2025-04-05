@@ -55,8 +55,8 @@ export default function useGameLogic({ getPlayerChosenColor }: UseGameLogicProps
   }
 
   const discardCard = async (card: Card, playerTurn: number, playerId: string) => {
-    //TODO Regla del 0
-    //TODO Regla del 7
+    //TODO - Regla del 0 - Rotar las cartas con el siguiente jugador
+    //TODO - Regla del 7 - Cambiar cartas con el jugador que se escoja
     if (!board) return
 
     const { hands, discardPile, activeCard, activeColor } = board
@@ -64,19 +64,22 @@ export default function useGameLogic({ getPlayerChosenColor }: UseGameLogicProps
     const isValidCard = card.color === activeColor || card.value === activeCard.value
 
     // Si otro jugador intenta jugar fuera de su turno
-    if (playerTurn !== turn && !isValidCard) {
+    //FIXME - No realiza bien el filtro para robar turno, con que el color sea igual ya permite jugar
+    //FIXME - Si se esta escogiendo el color, no se puede jugar
+    if (playerTurn !== turn && !isValidCard) { 
       const newBoard = drawCard(playerId, 2)
       socket.emit('drawCard', newBoard)
       return
     }
-
-
+    
+    // Penalizacion por jugar una carta no valida al jugador activo
     if (!isWildCard && !isValidCard) {
       const newBoard = drawCard(playerId, 2)
       socket.emit('drawCard', newBoard)
       return
     }
 
+    // Descartar la carta del jugador
     const newHands = { ...hands }
     newHands[playerId] = newHands[playerId].filter(c => c.key !== card.key)
     const newDiscardPile = [...discardPile, card]
