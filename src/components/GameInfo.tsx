@@ -3,7 +3,7 @@ import { GameContext } from '../context/game'
 
 import { GameDirection } from '../types/game'
 
-import { Card as CardComponent } from './Card'
+import { Card as CardComponent } from './CardComponent'
 
 const { CLOCKWISE } = GameDirection
 

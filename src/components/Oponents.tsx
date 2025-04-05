@@ -3,7 +3,7 @@ import { GameContext } from '../context/game'
 
 import { type Player } from '../types/game'
 
-import { Card as CardComponent } from './Card'
+import { Card as CardComponent } from './CardComponent'
 
 interface GameInfoProps {
   readonly playerRef: React.RefObject<Player>

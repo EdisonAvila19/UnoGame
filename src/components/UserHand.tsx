@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { GameContext } from '../context/game'
 
-import { Card as CardComponent } from './Card'
+import { Card as CardComponent } from './CardComponent.tsx'
 
 import useGameLogic from '../hooks/useGameLogic.ts'
 
