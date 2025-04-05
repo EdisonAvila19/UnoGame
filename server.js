@@ -85,4 +85,4 @@ io.on('connection', (socket) => {
   })
 })
 
-server.listen(process.env.SERVER_PORT, () => console.log(`Servidor corriendo en el puerto ${process.env.SERVER_PORT}`))
+server.listen(process.env.SERVER_PORT, '0.0.0.0', () => console.log(`Servidor corriendo en el puerto ${process.env.SERVER_PORT}`))
