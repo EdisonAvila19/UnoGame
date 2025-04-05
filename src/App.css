@@ -43,7 +43,6 @@ main {
 }
 
 h1 {
-  /* position: absolute; */
   font-size: 7rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -51,12 +50,12 @@ h1 {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  text-shadow: 3px 3px 5px #00000066, -1px -1px 2px #ffffff80; Efecto de profundidad
+  text-shadow: 3px 3px 5px #00000066, -1px -1px 2px #ffffff80; /*Efecto de profundidad*/
   letter-spacing: 5px;
   transform: rotate(-15deg);
   height: fit-content;
   margin-right: 60px;
-  filter: drop-shadow(3px 3px 5px #00000080); Efecto 3D
+  filter: drop-shadow(3px 3px 5px #00000080); /*Efecto 3D*/
   top: -10px;
 }
 
@@ -110,14 +109,10 @@ h1 {
 }
 
 .game-info {
-  /* margin-left: 200px; */
   display: flex;
   gap: 50px;
   align-items: center;
   justify-content: space-evenly;
-}
-.game-info h3 {
-  /* color: #F0FFF0; */
 }
 
 .modal {
@@ -253,7 +248,6 @@ h1 {
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  /* border: 1px solid black; */
 }
 
 .handBlock {
