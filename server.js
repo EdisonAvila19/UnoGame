@@ -4,6 +4,8 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import 'dotenv/config';
 
+console.log('Iniciando archivo server.js');
+
 const app = express();
 const server = createServer(app);
 
