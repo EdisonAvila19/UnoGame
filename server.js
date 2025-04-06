@@ -1,8 +1,12 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-// import cors from 'cors';
 import 'dotenv/config';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = createServer(app);
@@ -25,6 +29,14 @@ let gameState = {
   players: [], // Player[]
 };
 
+// Para que el servidor pueda servir los archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, 'dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// Para que el servidor pueda gestionar los sockets
 io.on('connection', (socket) => {
   console.log(`Jugador conectado: ${socket.id}`);
 
@@ -86,4 +98,5 @@ io.on('connection', (socket) => {
   })
 })
 
+// El servidor escucha desde el puerto que se le indique en el .env
 server.listen(process.env.SERVER_PORT, '0.0.0.0', () => console.log(`Servidor corriendo en el puerto ${process.env.SERVER_PORT}`));
