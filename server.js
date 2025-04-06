@@ -1,12 +1,7 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import 'dotenv/config';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = createServer(app);
@@ -29,12 +24,6 @@ let gameState = {
   players: [], // Player[]
 };
 
-// Para que el servidor pueda servir los archivos estáticos del frontend
-app.use(express.static(path.join(__dirname, 'dist')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
 
 // Para que el servidor pueda gestionar los sockets
 io.on('connection', (socket) => {
