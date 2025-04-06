@@ -1,8 +1,0 @@
-[phases.setup]
-nixpkgs = ["bun"]
-
-[phases.build]
-cmds = []
-
-[phases.start]
-cmd = "bun server.js"
