@@ -4,8 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run frontend/dev.ts",
-    "server": "node backend/server.js"
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "bun run --filter ./backend dev",
+    "dev": "bun run dev:frontend & bun run dev:backend"
   },
   "devDependencies": {
     "@types/bun": "latest"
