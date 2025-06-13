@@ -15,13 +15,13 @@ export default function App() {
   const NumberOfCardsPerPlayer = 7
 
   const [showColorModal, setShowColorModal] = useState<boolean>(false)
-  const [resolveColor, setResolveColor] = useState<((color: Color) => void) | null>(null);
+  const [resolveColor, setResolveColor] = useState<((color: Color) => void) | null>(null)
 
   const playerRef = useRef<Player>({
     id: '',
     name: '',
     turn: 0
-  });
+  })
 
   const { board, gameStart } = useContext(GameContext)!
 
@@ -30,16 +30,16 @@ export default function App() {
   // Choose Color Modal
   const getPlayerChosenColor = () => {
     return new Promise<Color>((resolve) => {
-      setShowColorModal(true);
-      setResolveColor(() => resolve); // Guardamos `resolve` para usarlo más tarde
-    });
-  };
+      setShowColorModal(true)
+      setResolveColor(() => resolve) // Guardamos `resolve` para usarlo más tarde
+    })
+  }
 
   const handleColorSelect = useCallback((color: Color) => {
     if (resolveColor) {
-      resolveColor(color);
-      setShowColorModal(false);
-      setResolveColor(null);
+      resolveColor(color)
+      setShowColorModal(false)
+      setResolveColor(null)
     }
   }, [resolveColor])
 

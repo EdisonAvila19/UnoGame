@@ -17,19 +17,18 @@ import { socket } from '../services/socket'
 
 export function UserHand({ playerRef, getPlayerChosenColor }: UserHandProps) {
   const { board, turn, penalty } = useContext(GameContext)!
-  
   const { discardCard, drawCard, endTurn } = useGameLogic({ getPlayerChosenColor })
   if (!board) return null
   
   const drawPenaltyCards = (playerTurn: number, playerId: string) => {
-    const newBoard = drawCard(playerId, penalty);
+    const newBoard = drawCard(playerId, penalty)
     const nextPlayer = endTurn(playerTurn)
     socket.emit('endTurn', { ...newBoard, turn: nextPlayer, penalty: 0 })
   }
 
   const handleDrawCard = (playerIndex: string) => {
-    const newBoard = drawCard(playerIndex); 
-    socket.emit('drawCard', newBoard);
+    const newBoard = drawCard(playerIndex)
+    socket.emit('drawCard', newBoard)
   }
 
   return (

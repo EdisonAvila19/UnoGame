@@ -44,11 +44,15 @@ io.on('connection', (socket) => {
   console.log(`Jugador conectado: ${socket.id}`);
 
   socket.on('joinGame', (playerName) => {
+
+    // Si el numero de jugadores es menor a 4
     if (gameState.players.length < 4) {
       const player = gameState.players.find(p => p.id === socket.id);
+      
+      // Si el jugador no existe en el juego
       if (!player) {
         gameState.players.push({ id: socket.id, name: playerName, turn: gameState.players.length });
-        
+
         // Emitir a todos los clientes el estado actualizado del juego
         io.emit('gameState', gameState);
         io.emit('updatePlayers', gameState.players);

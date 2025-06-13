@@ -16,7 +16,7 @@ export function GameBoard({ playerRef, getPlayerChosenColor }: GameBoardProps) {
       <GameInfo />
   
       {/* User Hand */}
-      <UserHand playerRef={playerRef}getPlayerChosenColor={getPlayerChosenColor} />
+      <UserHand playerRef={playerRef} getPlayerChosenColor={getPlayerChosenColor} />
 
       {/* Oponent Hand */}
       <Oponentes playerRef={playerRef} />
