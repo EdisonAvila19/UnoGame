@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = ['bun']
-
-[phases.build]
-cmds = []
-
-[start]
-cmd = "bun server.js"
