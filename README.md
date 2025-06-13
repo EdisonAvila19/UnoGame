@@ -28,5 +28,5 @@ El juego sigue las reglas clasicas pero tiene algunas nuevas:
 
 ## Comandos
 
-- `bun server`: Ejecuta el servidor
-- `bun dev`: Ejecuta el cliente
+- `npm run dev:frontend`: Ejecuta el cliente
+- `npm run dev:backend`: Ejecuta el servidor
