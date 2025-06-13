@@ -24,6 +24,7 @@ export default function useGameSocket ({ updatePlayer, playerRef, NumberOfCardsP
 
     const handleGameState = (data: GameState) => {
       const { players, turn, penalty, gameDirection, gameStart, id, ...rest} = data
+
       setBoard(rest)
       setTurn(turn)
       setPenalty(penalty)
@@ -40,15 +41,22 @@ export default function useGameSocket ({ updatePlayer, playerRef, NumberOfCardsP
       setPlayers(players)
     }
 
+    const handlePlayerJoined = (id: string) => {
+      updatePlayer({...playerRef.current, id})
+    }
+
     socket.off('gameState')
     socket.off('updatePlayers')
+    socket.off('playerJoined')
 
     socket.on('gameState', handleGameState)
     socket.on('updatePlayers', handleUpdatePlayers)
+    socket.on('playerJoined', handlePlayerJoined)
 
     return () => {
       socket.off('gameState')
       socket.off('updatePlayers')
+      socket.off('playerJoined')
     }
   }, [])
 
