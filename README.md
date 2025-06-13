@@ -7,8 +7,11 @@ El juego sigue las reglas clasicas pero tiene algunas nuevas:
 - El jugador sera sancionado al cometer un error.
 
 ## 🔗 URLs desplegadas 
+> [!WARNING]
+> Backend actualmente caido
 - 🔴 **Frontend (Netlify)**: [https://unodev.netlify.app](https://unodev.netlify.app)
 - ⚙️ **Backend (Railway)**: [https://unogame-production.up.railway.app](https://unogame-production.up.railway.app)
+
 
 ## 🚀 Tecnologías
 
@@ -27,8 +30,3 @@ El juego sigue las reglas clasicas pero tiene algunas nuevas:
 
 - `bun server`: Ejecuta el servidor
 - `bun dev`: Ejecuta el cliente
-
-## Fonts 
-https://fontsource.org/fonts/fredoka-one
-https://fontsource.org/fonts/caprasimo
-https://fontsource.org/fonts/shrikhand
