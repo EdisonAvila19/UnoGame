@@ -17,7 +17,7 @@ beforeAll((done) => {
 
     done()
   })
-})inst
+})
 
 afterAll((done) => {
   server.close(() => {
@@ -26,18 +26,21 @@ afterAll((done) => {
   })
 })
 
-test('El servidor acepta conexiones y responde al unirse', () => {
+test('El servidor acepta conexiones y responde al unirse', async () => {
   // Conectar el cliente(frontend) al servidor de WebSocket
   clientSocket = new Client(serverURL)
-  clientSocket.on('connect', () => {
-    console.log('Cliente conectado al servidor de WebSocket')
-  })
+
+  await new Promise( resolve => {clientSocket.on('connect', resolve) })
+  expect(clientSocket.connected).toBe(true)
 
   clientSocket.emit('joinGame', 'Jugador1')
-  clientSocket.on('playerJoined', (playerId) => {
-    expect(typeof playerId).toBe('string')
-    expect(playerId).toBe(clientSocket.id)
+
+  const playerId = await new Promise( resolve => {
+    clientSocket.on('playerJoined', resolve)
   })
+
+  expect(typeof playerId).toBe('string')
+  expect(playerId).toBe(clientSocket.id)
 
   clientSocket.close()
 })
