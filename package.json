@@ -10,7 +10,9 @@
   "scripts": {
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "bun run --filter ./backend dev",
-    "dev-full": "bun run dev:frontend & bun run dev:backend"
+    "dev-full": "bun run dev:frontend & bun run dev:backend",
+    "test:back_s": "bun run --filter ./backend test:s",
+    "test:back_m": "bun run --filter ./backend test:m"
   },
   "devDependencies": {
     "@types/bun": "latest"

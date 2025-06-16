@@ -14,7 +14,7 @@
       "name": "backend",
       "dependencies": {
         "cors": "2.8.5",
-        "dotenv": "^16.5.0",
+        "dotenv": "16.5.0",
         "express": "5.1.0",
         "jest": "30.0.0",
         "socket.io": "4.8.1",
@@ -751,6 +751,8 @@
     "jest-each": ["jest-each@30.0.0", "", { "dependencies": { "@jest/get-type": "30.0.0", "@jest/types": "30.0.0", "chalk": "^4.1.2", "jest-util": "30.0.0", "pretty-format": "30.0.0" } }, "sha512-qkFEW3cfytEjG2KtrhwtldZfXYnWSanO8xUMXLe4A6yaiHMHJUalk0Yyv4MQH6aeaxgi4sGVrukvF0lPMM7U1w=="],
 
     "jest-environment-node": ["jest-environment-node@30.0.0", "", { "dependencies": { "@jest/environment": "30.0.0", "@jest/fake-timers": "30.0.0", "@jest/types": "30.0.0", "@types/node": "*", "jest-mock": "30.0.0", "jest-util": "30.0.0", "jest-validate": "30.0.0" } }, "sha512-sF6lxyA25dIURyDk4voYmGU9Uwz2rQKMfjxKnDd19yk+qxKGrimFqS5YsPHWTlAVBo+YhWzXsqZoaMzrTFvqfg=="],
+
+    "jest-expect-message": ["jest-expect-message@1.1.3", "", {}, "sha512-bTK77T4P+zto+XepAX3low8XVQxDgaEqh3jSTQOG8qvPpD69LsIdyJTa+RmnJh3HNSzJng62/44RPPc7OIlFxg=="],
 
     "jest-haste-map": ["jest-haste-map@30.0.0", "", { "dependencies": { "@jest/types": "30.0.0", "@types/node": "*", "anymatch": "^3.1.3", "fb-watchman": "^2.0.2", "graceful-fs": "^4.2.11", "jest-regex-util": "30.0.0", "jest-util": "30.0.0", "jest-worker": "30.0.0", "micromatch": "^4.0.8", "walker": "^1.0.8" }, "optionalDependencies": { "fsevents": "^2.3.3" } }, "sha512-p4bXAhXTawTsADgQgTpbymdLaTyPW1xWNu1oIGG7/N3LIAbZVkH2JMJqS8/IUcnGR8Kc7WFE+vWbJvsqGCWZXw=="],
 

@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "bun run server.js",
-    "test": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js"
+    "test:s": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js -- single",
+    "test:m": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js -- multiple"
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -15,7 +16,7 @@
   },
   "dependencies": {
     "cors": "2.8.5",
-    "dotenv": "^16.5.0",
+    "dotenv": "16.5.0",
     "express": "5.1.0",
     "jest": "30.0.0",
     "socket.io": "4.8.1",
