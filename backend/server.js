@@ -1,6 +1,6 @@
 import 'dotenv/config'
-import { server, io } from './src/app.js'
-import { setupSocketHandlers } from './src/game'
+import { server, io } from '@/app'
+import { setupSocketHandlers } from '@/game'
 
 setupSocketHandlers(io)
 

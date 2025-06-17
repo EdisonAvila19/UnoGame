@@ -1,5 +1,5 @@
-import { server, io } from '../src/app.js'
-import { setupSocketHandlers } from '../src/game.js'
+import { server, io } from '@/app.js'
+import { setupSocketHandlers } from '@/game.js'
 
 import { io as Client } from 'socket.io-client'
 
