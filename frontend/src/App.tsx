@@ -1,15 +1,15 @@
-import './App.css'
+import '@/App.css'
 import { useState, useCallback, useRef, useContext } from 'react'
-import { GameContext } from './context/game'
+import { GameContext } from '@/context/game'
 
-import { type Color } from './game/deck'
-import { type Player } from './types/game'
+import { type Color } from '@/game/deck'
+import { type Player } from '@/types/game'
 
-import useGameSocket from './hooks/useGameSocket'
+import useGameSocket from '@/hooks/useGameSocket'
 
-import { StartMenu } from './components/StartMenu'
-import { GameBoard } from './components/GameBoard'
-import { ColorModal } from './components/ColorModal'
+import { StartMenu } from '@/components/StartMenu'
+import { GameBoard } from '@/components/GameBoard'
+import { ColorModal } from '@/components/ColorModal'
 
 export default function App() {
   const NumberOfCardsPerPlayer = 7

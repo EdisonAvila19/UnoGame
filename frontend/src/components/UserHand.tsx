@@ -1,12 +1,12 @@
 import { useContext } from 'react'
-import { GameContext } from '../context/game'
+import { GameContext } from '@/context/game'
 
-import { Card as CardComponent } from './CardComponent.tsx'
+import { Card as CardComponent } from '@/components/CardComponent'
 
-import useGameLogic from '../hooks/useGameLogic.ts'
+import useGameLogic from '@/hooks/useGameLogic'
 
-import type { Player } from '../types/game'
-import { type Color } from '../game/deck'
+import type { Player } from '@/types/game'
+import { type Color } from '@/game/deck'
 
 interface UserHandProps {
   readonly playerRef: React.RefObject<Player>,

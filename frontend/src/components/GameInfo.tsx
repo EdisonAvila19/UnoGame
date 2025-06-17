@@ -1,9 +1,9 @@
 import { useContext } from 'react'
-import { GameContext } from '../context/game'
+import { GameContext } from '@/context/game'
 
-import { GameDirection } from '../types/game'
+import { GameDirection } from '@/types/game'
 
-import { Card as CardComponent } from './CardComponent'
+import { Card as CardComponent } from '@/components/CardComponent'
 
 const { CLOCKWISE } = GameDirection
 

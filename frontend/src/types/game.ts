@@ -1,4 +1,4 @@
-import type { Card, Color } from '../game/deck'
+import type { Card, Color } from '@/game/deck'
 
 export const GameDirection = {
   CLOCKWISE: 'Clockwise',

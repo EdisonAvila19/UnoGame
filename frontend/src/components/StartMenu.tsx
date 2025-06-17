@@ -1,7 +1,7 @@
 import { useContext } from 'react'
-import { GameContext } from '../context/game';
+import { GameContext } from '@/context/game'
 
-import { type Player } from '../types/game'
+import { type Player } from '@/types/game'
 
 interface StartMenuProps {
   readonly playerRef: React.RefObject<Player>

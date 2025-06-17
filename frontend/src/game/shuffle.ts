@@ -1,4 +1,4 @@
-import type { Card } from './deck'
+import type { Card } from '@/game/deck'
 
 export function shuffle (deck: Card[]): Card[] {
   const shuffledDeck = [...deck]

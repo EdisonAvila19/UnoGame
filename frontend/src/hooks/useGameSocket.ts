@@ -1,13 +1,13 @@
 import { useEffect, useContext } from 'react'
-import { GameContext } from '../context/game'
+import { GameContext } from '@/context/game'
 
-import { socket } from '../services/socket'
+import { socket } from '@/services/socket'
 
-import type { GameState, Player } from '../types/game'
+import type { GameState, Player } from '@/types/game'
 
-import { generateDeck } from '../game/deck'
-import { calculateDecksNeeded } from '../game/calculateNumberDecks'
-import { dealCards } from '../game/deal'
+import { generateDeck } from '@/game/deck'
+import { calculateDecksNeeded } from '@/game/calculateNumberDecks'
+import { dealCards } from '@/game/deal'
 
 
 export interface UseGameSocketProps {

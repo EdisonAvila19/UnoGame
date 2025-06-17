@@ -1,11 +1,11 @@
 import { useContext } from 'react'
-import { socket } from '../services/socket'
+import { socket } from '@/services/socket'
 
-import { shuffle } from '../game/shuffle'
+import { shuffle } from '@/game/shuffle'
 
-import { type Card, CardType, SPECIAL_CARDS, WILD_CARDS, type Color, type CardValue } from '../game/deck'
-import { type Board, GameDirection } from '../types/game'
-import { GameContext } from '../context/game'
+import { type Card, CardType, SPECIAL_CARDS, WILD_CARDS, type Color, type CardValue } from '@/game/deck'
+import { type Board, GameDirection } from '@/types/game'
+import { GameContext } from '@/context/game'
 
 const { CLOCKWISE, COUNTER_CLOCKWISE } = GameDirection
 

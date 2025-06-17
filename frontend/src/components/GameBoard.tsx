@@ -1,9 +1,9 @@
-import { GameInfo } from './GameInfo'
-import { UserHand } from './UserHand'
-import { Oponentes } from './Oponents'
+import { GameInfo } from '@/components/GameInfo'
+import { UserHand } from '@/components/UserHand'
+import { Oponentes } from '@/components/Oponents'
 
-import type { Player } from '../types/game'
-import type { Color } from '../game/deck'
+import type { Player } from '@/types/game'
+import type { Color } from '@/game/deck'
 
 interface GameBoardProps {
   readonly playerRef: React.RefObject<Player>

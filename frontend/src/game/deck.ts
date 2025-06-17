@@ -1,4 +1,4 @@
-import { shuffle } from './shuffle'
+import { shuffle } from '@/game/shuffle'
 
 export const CardType = {
   NUMBER : 'number',

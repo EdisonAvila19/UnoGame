@@ -1,5 +1,5 @@
-import type { Card } from './deck'
-import type { Player, Hands } from '../types/game'
+import type { Card } from '@/game/deck'
+import type { Player, Hands } from '@/types/game'
 
 export function dealCards(deck: Card[], players: Player[], cardsPerPlayer: number) {
   // const numPlayers = players.length

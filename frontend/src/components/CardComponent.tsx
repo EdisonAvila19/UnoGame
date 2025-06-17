@@ -1,5 +1,5 @@
-import type { Card as CardType } from '../game/deck'
-import { WILD_CARDS } from '../game/deck'
+import type { Card as CardType } from '@/game/deck'
+import { WILD_CARDS } from '@/game/deck'
 
 const { CHANGE_COLOR } = WILD_CARDS
 

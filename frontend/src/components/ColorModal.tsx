@@ -1,4 +1,4 @@
-import { type Color, COLORS } from '../game/deck'
+import { type Color, COLORS } from '@/game/deck'
 
 type ColorModalProps = {
   readonly changeColor: (color: Color) => void

@@ -1,7 +1,7 @@
 import { useState, createContext, useMemo } from 'react'
 
-import type { GameDirectionType, Board, Player } from '../types/game'
-import { GameDirection } from '../types/game'
+import type { GameDirectionType, Board, Player } from '@/types/game'
+import { GameDirection } from '@/types/game'
 
 const { CLOCKWISE } = GameDirection
 
