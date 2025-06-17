@@ -35,11 +35,8 @@ test('El servidor acepta multiples conexiones una a una', async () => {
   let clients = []
   
   try {
-    clients = await Promise.all([
-      connectClient(),
-      connectClient(),
-      connectClient()
-    ])
+    clients = await Promise.all(Array.from({ length: 3 }, () => connectClient()))
+
     // Verificar que todos los clientes están conectados
     clients.forEach((client) => {
       expect(client.connected).toBe(true)
@@ -53,14 +50,16 @@ test('El servidor acepta multiples conexiones una a una', async () => {
       boards[client.id] = await new Promise((resolve) => {
       Promise.all([
         new Promise(resolve => client.on('playerJoined', resolve)),
-        new Promise(resolve => client.on('updatePlayers', resolve)),
         new Promise(resolve => client.on('gameState', resolve)),
+        new Promise(resolve => client.on('updatePlayers', resolve)),
       ]).then(resolve);
       });
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
-  
+    
+    // board [bid, board, players]
     Object.entries(boards).forEach(([userId, [bid, board, players]]) => {
+      console.log('players', players)
       // Verificar que el ID del jugador este en la lista de jugadores
       expect(players.some(({id}) => id === userId )).toBe(true)
       // console.log(players)
